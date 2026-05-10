@@ -18,13 +18,14 @@ RUN pnpm build
 
 
 FROM base AS runner
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLE=1
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-COPY --from=builder --chown=appuser:appgroup /app/apps/web/.next/standalone ./
-COPY --from=builder --chown=appuser:appgroup /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder --chown=appuser:appgroup /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
+RUN chown -R appuser:appgroup /app
 USER appuser
 EXPOSE 3000
 CMD ["node","apps/web/server.js"]

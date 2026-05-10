@@ -20,5 +20,28 @@ services:
     ports:
       - 8080:8080
 
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+  web-dev:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
+    ports:
+      - "3000:3000"
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/web/
+          target: /app/apps/web
+          initial_sync: true
+          ignore: ./apps/web/node_modules/
+        - action: sync+restart
+          path: ./apps/web/package.json
+          target: /app/apps/web/package.json
+
 volumes:
   postgres_data:

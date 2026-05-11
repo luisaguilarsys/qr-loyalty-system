@@ -12,3 +12,108 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(CASHIER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions     Session[]
+  transactions PointTransaction[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Customer {
+  id         String    @id @default(uuid())
+  name       String
+  secondName String?
+  lastName   String
+  email      String?   @unique
+  phone      String?   @unique
+  birthDate  DateTime?
+  isActive   Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  balance      CustomerBalance?
+  transactions PointTransaction[]
+  qrCodes      CustomerQr[]
+
+  @@index([name])
+}
+
+model CustomerQr {
+  id            String    @id @default(uuid())
+  customerId    String
+  customer      Customer  @relation(fields: [customerId], references: [id])
+  token         String    @unique @default(cuid())
+  isActive      Boolean   @default(true)
+  reason        String? //qr change reason
+  createdAt     DateTime  @default(now())
+  deactivatedAt DateTime?
+
+  @@index([token])
+  @@index([customerId])
+}
+
+model CustomerBalance {
+  id         String   @id @default(uuid())
+  customerId String   @unique
+  customer   Customer @relation(fields: [customerId], references: [id])
+  points     Int      @default(0)
+  updatedAt  DateTime @updatedAt
+}
+
+model PointTransaction {
+  id         String          @id @default(uuid())
+  customerId String
+  customer   Customer        @relation(fields: [customerId], references: [id])
+  cashierId  String?
+  cashier    User?           @relation(fields: [cashierId], references: [id])
+  type       TransactionType
+  points     Int //+/- para earn o redem
+
+  saleAmount  Decimal? @db.Decimal(10, 2)
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([customerId, createdAt])
+  @@index([cashierId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Settings {
+  id            String  @id @default("singleton") // solo existe 1 fila siempre
+  businessName  String  @default("Mi Negocio")
+  pointsPerPeso Decimal @default(0.1) @db.Decimal(5, 4) // $10 = 1 punto por default
+  primaryColor  String  @default("#6366f1")
+  logoUrl       String?
+}
+
+enum TransactionType {
+  EARN
+  REDEEM
+  ADJUSTMENT
+}
+
+enum Role {
+  ADMIN
+  CASHIER
+}

@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider     = "prisma-client"
   output       = "../src/generated/prisma"
@@ -87,7 +85,7 @@ model PointTransaction {
   cashierId  String?
   cashier    User?           @relation(fields: [cashierId], references: [id])
   type       TransactionType
-  points     Int //+/- para earn o redem
+  points     Int //+/- to earn or redem
 
   saleAmount  Decimal? @db.Decimal(10, 2)
   description String?
@@ -100,10 +98,10 @@ model PointTransaction {
 }
 
 model Settings {
-  id            String  @id @default("singleton") // solo existe 1 fila siempre
-  businessName  String  @default("Mi Negocio")
-  pointsPerPeso Decimal @default(0.1) @db.Decimal(5, 4) // $10 = 1 punto por default
-  primaryColor  String  @default("#6366f1")
+  id            String  @id @default("singleton")
+  businessName  String  @default("My business")
+  pointsPerPeso Decimal @default(0.1) @db.Decimal(5, 4) // $10 = 1 point by default
+  primaryColor  String  @default("#7BA7C4")
   logoUrl       String?
 }
 

@@ -32,7 +32,7 @@ async function main() {
   });
 
   const customer = await prisma.customer.upsert({
-    where: { id: 'a1b2c3d4-0000-0000-0000-000000000001' },
+    where: { id: '598cff1d-b0c1-4f15-8da9-45faa9ed98ba' },
     update: {
       name: 'Client',
       lastName: 'Demo',
@@ -40,6 +40,7 @@ async function main() {
       phone: '5512345678',
     },
     create: {
+      id: '598cff1d-b0c1-4f15-8da9-45faa9ed98ba',
       name: 'Client',
       lastName: 'Demo',
       email: 'client@example.com',

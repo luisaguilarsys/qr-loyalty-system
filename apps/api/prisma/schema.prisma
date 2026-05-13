@@ -37,14 +37,15 @@ model Session {
 }
 
 model Customer {
-  id         String    @id @default(uuid())
-  name       String
-  middleName String?
-  lastName   String
-  email      String?
-  phone      String?
-  birthDate  DateTime?
-  isActive   Boolean   @default(true)
+  id           String    @id @default(uuid())
+  memberNumber Int       @unique @default(autoincrement())
+  name         String
+  middleName   String?
+  lastName     String
+  email        String?
+  phone        String?
+  birthDate    DateTime?
+  isActive     Boolean   @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

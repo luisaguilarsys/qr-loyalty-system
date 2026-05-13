@@ -41,10 +41,10 @@ model Session {
 model Customer {
   id         String    @id @default(uuid())
   name       String
-  secondName String?
+  middleName String?
   lastName   String
-  email      String?   @unique
-  phone      String?   @unique
+  email      String?
+  phone      String?
   birthDate  DateTime?
   isActive   Boolean   @default(true)
 

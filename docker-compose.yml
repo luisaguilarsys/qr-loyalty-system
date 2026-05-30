@@ -1,8 +1,8 @@
 services:
   db:
     image: postgres:18-alpine
-    restart: always
     shm_size: 128mb
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -14,15 +14,17 @@ services:
       interval: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     networks:
       - backend
 
   adminer:
     image: adminer
-    restart: always
+    restart: unless-stopped
     ports:
-      - 8080:8080
+      - 127.0.0.1:8080:8080
+    networks:
+      - backend
 
   api:
     build:

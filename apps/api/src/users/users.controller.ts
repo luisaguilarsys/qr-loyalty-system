@@ -3,6 +3,7 @@ import { SaveUser, UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { type UUID } from 'crypto';
+// TODO: refactor all responses to use ResponseFactory
 
 @Controller('users')
 export class UsersController {

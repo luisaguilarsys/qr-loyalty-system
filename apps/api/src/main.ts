@@ -27,7 +27,6 @@ async function bootstrap() {
 
 bootstrap()
   .then(() => {
-    console.log(IP_HOST, PORT);
     console.log(`[API] Server: http://${IP_HOST}:${PORT}`);
   })
   .catch((err) => {

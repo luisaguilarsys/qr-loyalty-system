@@ -1,6 +1,5 @@
 import { ApiError, ApiResponse, PaginationMeta, ResponseMeta } from './api-response.dto';
 
-// TODO: Get version automatically
 const VERSION = process.env.API_VERSION ?? '1.0.0';
 
 function buildMeta(path: string, pagination?: PaginationMeta): ResponseMeta {

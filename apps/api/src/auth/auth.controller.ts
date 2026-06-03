@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request,SetMetadata } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './auth.dto';
+import { LoginDto, RefreshDto } from './auth.dto';
 import { Role } from '@generated/enums';
 import { Roles } from '@/common/decorators/roles.decorator';
 
@@ -23,6 +23,13 @@ export class AuthController {
     @Get('profile')
     getProfile(@Request() req:any) {
         return req.user ;
+    }
+
+    @SkipAuth()
+    @HttpCode(HttpStatus.OK)
+    @Post('refresh')
+    refresh(@Body() refreshDto:RefreshDto){
+        return this.authService.refresh(refreshDto.refresh_token)
     }
     
 }

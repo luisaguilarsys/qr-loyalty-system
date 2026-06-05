@@ -10,6 +10,16 @@ export class AuthService {
         private readonly jwtService: JwtService
     ){}
 
+    private async createTokens(payload: any): Promise<any>{
+        const [accessToken,refreshToken] = await Promise.all([
+            this.jwtService.signAsync(payload,{expiresIn:'15m'}),
+            this.jwtService.signAsync(payload,{expiresIn:'30m'})])
+
+        return [accessToken,refreshToken]
+    }
+
+    
+
     async signIn(email:string,password:string):Promise<any>{
         try{
 
@@ -20,11 +30,8 @@ export class AuthService {
             }
 
             const payload = { sub:user.id, email:user.email,roles:user.role }
+            const [accessToken,refreshToken] = await this.createTokens(payload)
 
-            const accessToken = await this.jwtService.signAsync(payload,{
-                expiresIn:'5m'
-            })
-            const refreshToken = await this.jwtService.signAsync(payload, { expiresIn: '30m' })
 
             const data = { access_token:accessToken, refresh_token:refreshToken}
 
@@ -43,8 +50,7 @@ export class AuthService {
             
             const payload = { sub:user.id, email:user.email, roles:user.role }
 
-            const accessToken = await this.jwtService.signAsync(payload,{expiresIn:'5m'})
-            const refreshToken = await this.jwtService.signAsync(payload,{expiresIn:'30m'})
+            const [accessToken,refreshToken] = await this.createTokens(payload)
 
             const data = { access_token:accessToken, refresh_token:refreshToken}
 

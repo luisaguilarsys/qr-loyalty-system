@@ -3,14 +3,14 @@ import { Role } from '@generated/client'
 
 export class CreateUserDto {
   @IsEmail()
-  email:string
+  email!:string
 
   @IsString()
   @MinLength(8)
-  password:string;
+  password!:string;
 
   @IsString()
-  name:string;
+  name!:string;
 
   @IsOptional()
   @IsEnum(Role)

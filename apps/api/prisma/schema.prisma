@@ -42,7 +42,7 @@ model Customer {
   name         String
   middleName   String?
   lastName     String
-  email        String
+  email        String    @unique
   phone        String?
   birthDate    DateTime?
   isActive     Boolean   @default(true)

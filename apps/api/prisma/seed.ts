@@ -44,6 +44,7 @@ async function main() {
       name: 'Client',
       lastName: 'Demo',
       email: 'client@example.com',
+      emailHash:'demo@example.com',
       phone: '5512345678',
     },
   });
@@ -70,9 +71,9 @@ async function main() {
 
   console.log('✅ Seed completed');
   console.log(
-    `Email: ${defaultCredentials.email}, Password: ${defaultCredentials.password}`,
+    `    Email: ${defaultCredentials.email}, Password: ${defaultCredentials.password}`,
   );
-  console.log(`   Demo client created: ${customer.id}`);
+  console.log(`    Demo client created: ${customer.id}`);
 }
 
 main()

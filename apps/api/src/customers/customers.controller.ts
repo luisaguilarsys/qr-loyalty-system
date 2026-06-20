@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Customer } from '@generated/client';
 import { type UUID } from 'crypto';
+import { FindCustomersQueryDto } from './dto/find-customers-query.dto';
 
 @Controller('customers')
 export class CustomersController {
@@ -15,8 +16,8 @@ export class CustomersController {
   }
 
   @Get()
-  findAll():Promise<Customer[]> {
-    return this.customersService.findAll();
+  findAll(@Query() query: FindCustomersQueryDto):Promise<Customer[]> {
+    return this.customersService.findAll(query);
   }
 
   @Get(':id')

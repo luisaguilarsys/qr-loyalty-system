@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
+  StreamableFile,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
@@ -22,6 +23,7 @@ export class TransformInterceptor<T>
 
     return next.handle().pipe(
       map((data) => {
+        if(data instanceof StreamableFile) return data;
         if (data && 'success' in data && 'status' in data) return data;
 
         return {

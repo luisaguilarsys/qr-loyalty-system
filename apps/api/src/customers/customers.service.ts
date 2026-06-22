@@ -6,10 +6,11 @@ import { Customer, Prisma } from '@generated/client';
 import { type UUID } from 'crypto';
 import { EncryptionService } from '@/common/encryption/encryption.service';
 import { FindCustomersQueryDto } from './dto/find-customers-query.dto';
+import { QrService } from '@/common/qr/qr.service';
 
 @Injectable()
 export class CustomersService {
-  constructor(private readonly prismaService:PrismaService, private readonly encryptionService:EncryptionService){}
+  constructor(private readonly prismaService:PrismaService, private readonly encryptionService:EncryptionService, private readonly qrService:QrService){}
 
 
   async create(createCustomerDto: CreateCustomerDto) {
@@ -27,10 +28,7 @@ export class CustomersService {
     }
 
     const customerCreated = await this.prismaService.customer.create({data})
-    const customerQr = await this.prismaService.customerQr.create({data:{customerId:customerCreated.id}})
-
-
-    console.log({customerCreated,customerQr})
+    const customerQr = await this.prismaService.customerQr.create({data:{customerId:customerCreated.id,reason:"new member"}})
 
     return customerCreated;
   }
@@ -128,4 +126,30 @@ export class CustomersService {
     if(!customerDeleted) throw new NotFoundException(`Customer with id ${id} not found`)
     return;
   }
+
+
+  // Qr Code generation for customers
+
+  async getQrImage(customerId:string): Promise<Buffer>{
+    const qrRecord = await this.prismaService.customerQr.findFirst({where:{customerId,isActive:true}})
+
+    if(!qrRecord) throw new NotFoundException('Qr record not found')
+    
+    return this.qrService.generateQrBuffer({v:1,token:qrRecord.token})
+
+  }
+
+  // Re-generate a new Qr Code for customer
+
+  async regenerateQr(customerId:string,reason?:string){
+    await this.prismaService.customerQr.updateMany({where:{customerId,isActive:true},data:{isActive:false,deactivatedAt:new Date()}})
+    
+    const newCustomerQr = await this.prismaService.customerQr.create({
+      data:{customerId,reason}
+    })
+
+    return this.qrService.generateQrBuffer({v:1,token:newCustomerQr.token})
+  }
+
+
 }

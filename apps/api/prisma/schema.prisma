@@ -23,6 +23,7 @@ model User {
 
   sessions     Session[]
   transactions PointTransaction[]
+  sales        Sale[]
 }
 
 model Session {
@@ -54,6 +55,7 @@ model Customer {
   balance      CustomerBalance?
   transactions PointTransaction[]
   qrCodes      CustomerQr[]
+  sales     Sale[]
 
   @@index([name])
 }
@@ -80,16 +82,40 @@ model CustomerBalance {
   updatedAt  DateTime @updatedAt
 }
 
+model Sale {
+  id            String        @id @default(uuid())
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  cashierId   String
+  cashier     User     @relation(fields: [cashierId], references: [id])
+
+  saleAmount     Decimal        @db.Decimal(10,2)
+  description    String?
+  paymentMethod PaymentMethod
+
+  pointTransaction  PointTransaction?
+
+  createdAt     DateTime @default(now())
+
+  @@index([customerId, createdAt])
+  @@index([cashierId])
+  @@index([createdAt])
+
+}
+
+
 model PointTransaction {
   id         String          @id @default(uuid())
   customerId String
   customer   Customer        @relation(fields: [customerId], references: [id])
-  cashierId  String?
-  cashier    User?           @relation(fields: [cashierId], references: [id])
+  cashierId  String
+  cashier    User           @relation(fields: [cashierId], references: [id])
   type       TransactionType
   points     Int //+/- to earn or redem
 
-  saleAmount  Decimal? @db.Decimal(10, 2)
+  saleId      String?       @unique
+  Sale        Sale?         @relation(fields:[saleId], references:[id])
+
   description String?
   createdAt   DateTime @default(now())
 
@@ -116,4 +142,10 @@ enum TransactionType {
 enum Role {
   ADMIN
   CASHIER
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
 }

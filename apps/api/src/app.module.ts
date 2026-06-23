@@ -7,8 +7,9 @@ import { SessionsModule } from './sessions/sessions.module';
 import { CustomersModule } from './customers/customers.module';
 import { EncryptionModule } from './common/encryption/encryption.module';
 import { QrModule } from './common/qr/qr.module';
+import { PointsModule } from './points/points.module';
 @Module({
-  imports: [UsersModule, AuthModule, SessionsModule, CustomersModule, EncryptionModule, QrModule],
+  imports: [UsersModule, AuthModule, SessionsModule, CustomersModule, EncryptionModule, QrModule, PointsModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -9,8 +9,9 @@ import { EncryptionModule } from './common/encryption/encryption.module';
 import { QrModule } from './common/qr/qr.module';
 import { PointsModule } from './points/points.module';
 import { SalesModule } from './sales/sales.module';
+import { SettingsModule } from './settings/settings.module';
 @Module({
-  imports: [UsersModule, AuthModule, SessionsModule, CustomersModule, EncryptionModule, QrModule, PointsModule, SalesModule],
+  imports: [UsersModule, AuthModule, SessionsModule, CustomersModule, EncryptionModule, QrModule, PointsModule, SalesModule, SettingsModule],
   controllers: [AppController],
   providers: [AppService],
 })

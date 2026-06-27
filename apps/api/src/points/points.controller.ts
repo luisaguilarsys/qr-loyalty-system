@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Request } from '@nestjs/common';
 import { PointsService } from './points.service';
 import { CreatePointDto } from './dto/create-point.dto';
-import { UpdatePointDto } from './dto/update-point.dto';
+import { type UUID } from 'crypto';
 
 @Controller('points')
 export class PointsController {
   constructor(private readonly pointsService: PointsService) {}
 
-  @Post()
-  create(@Body() createPointDto: CreatePointDto) {
-    return this.pointsService.create(createPointDto);
+  @Post('adjust')
+  create(@Body() createPointDto: CreatePointDto, @Request() req: any) {
+    const cashierId = req.user.sub;
+    return this.pointsService.create(createPointDto, cashierId);
   }
 
-  @Get()
-  findAll() {
-    return this.pointsService.findAll();
+  @Get('balance/:id')
+  findAll(@Param('id') id: UUID) {
+    return this.pointsService.getBalance(id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pointsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePointDto: UpdatePointDto) {
-    return this.pointsService.update(+id, updatePointDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pointsService.remove(+id);
+  @Get('history/:id')
+  findOne(@Param('id') id: UUID) {
+    return this.pointsService.getHistory(id);
   }
 }

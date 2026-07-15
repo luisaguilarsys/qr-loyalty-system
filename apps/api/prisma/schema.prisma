@@ -44,7 +44,7 @@ model Customer {
   middleName   String?
   lastName     String
   email        String
-  emailHash    String  @unique
+  emailHash    String    @unique
   phone        String?
   birthDate    DateTime?
   isActive     Boolean   @default(true)
@@ -55,7 +55,7 @@ model Customer {
   balance      CustomerBalance?
   transactions PointTransaction[]
   qrCodes      CustomerQr[]
-  sales     Sale[]
+  sales        Sale[]
 
   @@index([name])
 }
@@ -83,38 +83,49 @@ model CustomerBalance {
 }
 
 model Sale {
-  id            String        @id @default(uuid())
+  id         String    @id @default(uuid())
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id])
-  cashierId   String
-  cashier     User     @relation(fields: [cashierId], references: [id])
+  cashierId  String
+  cashier    User      @relation(fields: [cashierId], references: [id])
 
-  saleAmount     Decimal        @db.Decimal(10,2)
-  description    String?
-  paymentMethod PaymentMethod
+  saleAmount  Decimal @db.Decimal(10, 2)
+  description String?
 
-  pointTransaction  PointTransaction?
+  paymentMethod    PaymentMethod      @default(CASH)
+  pointTransaction PointTransaction[]
+  items            SaleItem[]
+  status           SaleStatus         @default(PENDING)
 
-  createdAt     DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([customerId, createdAt])
   @@index([cashierId])
   @@index([createdAt])
-
 }
 
+model SaleItem {
+  id        String  @id @default(uuid())
+  saleId    String
+  sale      Sale    @relation(fields: [saleId], references: [id])
+  name      String
+  unitPrice Decimal @db.Decimal(10, 2)
+  quantity  Int     @default(1)
+  subtotal  Decimal @db.Decimal(10, 2)
+
+  @@index([saleId])
+}
 
 model PointTransaction {
   id         String          @id @default(uuid())
   customerId String
   customer   Customer        @relation(fields: [customerId], references: [id])
   cashierId  String
-  cashier    User           @relation(fields: [cashierId], references: [id])
+  cashier    User            @relation(fields: [cashierId], references: [id])
   type       TransactionType
   points     Int //+/- to earn or redem
-
-  saleId      String?       @unique
-  Sale        Sale?         @relation(fields:[saleId], references:[id])
+  saleId     String?
+  Sale       Sale?           @relation(fields: [saleId], references: [id])
 
   description String?
   createdAt   DateTime @default(now())
@@ -148,4 +159,12 @@ enum PaymentMethod {
   CASH
   CARD
   TRANSFER
+}
+
+enum SaleStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  VOIDED
 }

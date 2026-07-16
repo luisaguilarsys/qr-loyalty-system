@@ -83,8 +83,7 @@ export class CustomersService {
   }
 
   async findAll(query: FindCustomersQueryDto): Promise<Customer[]> {
-    const { page = 1, limit = 20 } = query;
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = query;
     const where = this.buildWhere(query);
 
     const [customers, total] = await Promise.all([

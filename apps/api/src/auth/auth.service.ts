@@ -5,58 +5,53 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor (
-        private readonly userService: UsersService, 
-        private readonly jwtService: JwtService
-    ){}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-    private async createTokens(payload: any): Promise<any>{
-        const [accessToken,refreshToken] = await Promise.all([
-            this.jwtService.signAsync(payload,{expiresIn:'15m'}),
-            this.jwtService.signAsync(payload,{expiresIn:'30m'})])
+  private async createTokens(payload: any): Promise<any> {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, { expiresIn: '30m' }),
+      this.jwtService.signAsync(payload, { expiresIn: '60m' }),
+    ]);
 
-        return [accessToken,refreshToken]
+    return [accessToken, refreshToken];
+  }
+
+  async signIn(email: string, password: string): Promise<any> {
+    try {
+      const user = await this.userService.findOneByEmail(email);
+      const isPasswordMatch = await hashCompare(password, user.passwordHash);
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      const payload = { sub: user.id, email: user.email, roles: user.role };
+      const [accessToken, refreshToken] = await this.createTokens(payload);
+
+      const data = { access_token: accessToken, refresh_token: refreshToken };
+
+      return data;
+    } catch (err) {
+      throw new UnauthorizedException('Invalid credentials');
     }
+  }
 
-    
+  async refresh(old_refresh_token: string) {
+    try {
+      const oldPayload = await this.jwtService.verifyAsync(old_refresh_token);
+      const user = await this.userService.findOneByEmail(oldPayload.email);
 
-    async signIn(email:string,password:string):Promise<any>{
-        try{
+      const payload = { sub: user.id, email: user.email, roles: user.role };
 
-            const user = await this.userService.findOneByEmail(email)
-            const isPasswordMatch = await hashCompare(password, user.passwordHash)
-            if(!isPasswordMatch){
-                throw new UnauthorizedException('Invalid credentials')
-            }
+      const [accessToken, refreshToken] = await this.createTokens(payload);
 
-            const payload = { sub:user.id, email:user.email,roles:user.role }
-            const [accessToken,refreshToken] = await this.createTokens(payload)
+      const data = { access_token: accessToken, refresh_token: refreshToken };
 
-
-            const data = { access_token:accessToken, refresh_token:refreshToken}
-
-            return data
-
-        }catch(err) {
-            throw new UnauthorizedException('Invalid credentials')
-        }
-
+      return data;
+    } catch (err) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-
-    async refresh(old_refresh_token:string){
-        try{
-            const oldPayload = await this.jwtService.verifyAsync(old_refresh_token)
-            const user = await this.userService.findOneByEmail(oldPayload.email)
-            
-            const payload = { sub:user.id, email:user.email, roles:user.role }
-
-            const [accessToken,refreshToken] = await this.createTokens(payload)
-
-            const data = { access_token:accessToken, refresh_token:refreshToken}
-
-            return data
-
-        }catch(err){throw new UnauthorizedException('Invalid credentials')}
-
-    }
+  }
 }
